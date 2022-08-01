@@ -4,6 +4,8 @@ mod search;
 fn main() {
     let mut board = mancala::Mancala::new();
 
+    println!("{}", search::best_move(board.clone(), 10).unwrap());
+
     loop {
         // board.print();
 
