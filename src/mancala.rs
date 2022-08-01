@@ -22,8 +22,7 @@ impl Mancala {
     pub fn new() -> Self {
         Mancala {
             own_turn: true,
-            // pits: [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0]
-            pits: [3, 2, 2, 4, 2, 2, 11, 4, 6, 2, 3, 1, 0, 6]
+            pits: [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0]
         }
     }
 
@@ -91,23 +90,13 @@ impl Mancala {
         }
     }
 
-    pub fn valid_moves(&self) -> Vec<usize> {
-        let mut out = Vec::with_capacity(6);
-
-        if self.own_turn {
-            if self.pits[0] != 0 { out.push(0); }
-            if self.pits[1] != 0 { out.push(1); }
-            if self.pits[2] != 0 { out.push(2); }
-            if self.pits[3] != 0 { out.push(3); }
-            if self.pits[4] != 0 { out.push(4); }
-            if self.pits[5] != 0 { out.push(5); }
-        } else {
-            if self.pits[7] != 0  { out.push(7); }
-            if self.pits[8] != 0  { out.push(8); }
-            if self.pits[9] != 0  { out.push(9); }
-            if self.pits[10] != 0 { out.push(10); }
-            if self.pits[11] != 0 { out.push(11); }
-            if self.pits[12] != 0 { out.push(12); }
+    pub fn valid_moves(&self) -> [Option<usize>; 6] {
+        let mut out = [None; 6];
+    
+        let offset = if self.own_turn { 0 } else { 7 };
+    
+        for i in 0..6 {
+            if self.pits[offset + i] != 0 { out[i] = Some(offset + i) }
         }
 
         out

@@ -2,20 +2,34 @@ mod mancala;
 mod search;
 
 fn main() {
-    let mut board = mancala::Mancala::new();
+    use std::time::Instant;
+    let now = Instant::now();
 
-    println!("{}", search::best_move(board.clone(), 10).unwrap());
+    let board = mancala::Mancala::new();
+
+    // println!("{}", search::best_move(board.clone(), 16).unwrap());
+
+    for _ in 0..10 {
+        search::best_move(board.clone(), 15).unwrap();
+    }
+
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
+
+    return;
 
     loop {
         // board.print();
 
         if board.own_turn {
-            let best_move = search::best_move(board.clone(), 9).unwrap();
+            let best_move = search::best_move(board.clone(), 15).unwrap();
 
             println!("Making move {}", best_move);
 
             board.make_move(best_move);
         } else {
+            board.print();
+
             let mut input_text = String::new();
             std::io::stdin()
                 .read_line(&mut input_text)

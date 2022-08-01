@@ -5,14 +5,16 @@ pub fn best_move(board: mancala::Mancala, depth: u8) -> Option<usize> {
     let mut best_score = i32::MIN;
 
     for mve in board.valid_moves() {
+        if mve.is_none() { continue; }
+
         let mut board_copy = board.clone();
 
-        board_copy.make_move(mve);
+        board_copy.make_move(mve.unwrap());
 
         let score = minimax(board_copy, depth - 1, i32::MIN, i32::MAX);
         if score > best_score {
             best_score = score;
-            best_move = Some(mve);
+            best_move = mve;
         }
     }
 
@@ -30,9 +32,11 @@ pub fn minimax(board: mancala::Mancala, depth: u8, mut alpha: i32, mut beta: i32
         value = i32::MIN;
 
         for mve in board.valid_moves() {
+            if mve.is_none() { continue; }
+
             let mut board_copy = board.clone();
 
-            board_copy.make_move(mve);
+            board_copy.make_move(mve.unwrap());
 
             value = std::cmp::max(value, minimax(board_copy, depth - 1, alpha, beta));
             alpha = std::cmp::max(alpha, value);
@@ -44,9 +48,11 @@ pub fn minimax(board: mancala::Mancala, depth: u8, mut alpha: i32, mut beta: i32
         value = i32::MAX;
 
         for mve in board.valid_moves() {
+            if mve.is_none() { continue; }
+
             let mut board_copy = board.clone();
 
-            board_copy.make_move(mve);
+            board_copy.make_move(mve.unwrap());
 
             value = std::cmp::min(value, minimax(board_copy, depth - 1, alpha, beta));
             beta = std::cmp::min(beta, value);
