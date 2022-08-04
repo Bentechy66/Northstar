@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use crate::stacklist::StackList;
 
 /// Describes a Mancala board.
@@ -18,21 +19,41 @@ use crate::stacklist::StackList;
 ///   [ Own Store: 6 ]
 #[derive(Clone)]
 pub struct Mancala {
-    pub own_turn: bool,
     pits:         [u32; 14],
 }
 
 impl Mancala {
+    /// Return a new Mancala board with 4 stones in each pit, and 0 in each store.
     pub fn new() -> Self {
         Mancala {
-            own_turn: true,
             pits: [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0]
         }
     }
 
-    pub fn print(&self) {
-        println!(
-            " [{}]\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n [{}]\n\n{} to move", 
+    /// Set the amount of stones in a pit
+    /// Refer to the [struct-level documentation](Mancala) for pit IDs
+    pub fn set_pit(&mut self, pit_id: usize, value: u32) {
+        self.pits[pit_id] = value;
+    }
+
+    /// Get the amount of stones in a pit
+    /// Refer to the [struct-level documentation](Mancala) for pit IDs
+    pub fn get_pit(&self, pit_id: usize) -> u32 {
+        self.pits[pit_id]
+    }
+
+    /// Increment the amount of stones in a pit
+    /// Refer to the [struct-level documentation](Mancala) for pit IDs
+    pub fn increment_pit(&mut self, pit_id: usize, by: u32) {
+        self.pits[pit_id] += by as u32;
+    }
+}
+
+impl Display for Mancala {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            " [{}]\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n{}   {}\n [{}]", 
             self.pits[13], 
             self.pits[0], self.pits[12],
             self.pits[1], self.pits[11],
@@ -40,76 +61,14 @@ impl Mancala {
             self.pits[3], self.pits[9],
             self.pits[4], self.pits[8],
             self.pits[5], self.pits[7],
-            self.pits[6],
-            if self.own_turn { "self" } else { "other" }
-        );
-    }
-
-    pub fn make_move(&mut self, mut pit_idx: usize) {
-        let mut stone_count = self.pits[pit_idx];
-        self.pits[pit_idx] = 0;
-
-        while stone_count > 0 {
-            if pit_idx < 13 {
-                pit_idx += 1;
-            } else {
-                pit_idx = 0;
-            }
-            
-            if !((self.own_turn && pit_idx == 13) || (!self.own_turn && pit_idx == 6)) {
-                self.pits[pit_idx] += 1;
-                stone_count -= 1;
-            }
-        }
-
-        // You get another turn if you place your last stone in your store
-        if pit_idx != 13 && pit_idx != 6 {
-            // Placing a stone in an empty pit allows you to capture
-            if self.pits[pit_idx] == 1 {
-                // Ensure it's actually on our side
-                if self.own_turn && pit_idx < 6 {
-                    let captured_idx = 12 - pit_idx;
-                    if self.pits[captured_idx] != 0 {
-                        self.pits[6] += self.pits[captured_idx];
-                        self.pits[6] += self.pits[pit_idx];
-
-                        self.pits[captured_idx] = 0;
-                        self.pits[pit_idx] = 0;
-                    }
-                } else if !self.own_turn && pit_idx > 6 {
-                    let captured_idx = 12 - pit_idx;
-                    if self.pits[captured_idx] != 0 {
-                        self.pits[13] += self.pits[captured_idx];
-                        self.pits[13] += self.pits[pit_idx];
-
-                        self.pits[captured_idx] = 0;
-                        self.pits[pit_idx] = 0;
-                    }
-                }
-            }
-
-            self.own_turn = !self.own_turn;
-        }
-    }
-
-    pub fn valid_moves(&self) -> StackList<usize, 6> {
-        let mut out: StackList<usize, 6> = StackList::new();
-    
-        let offset = if self.own_turn { 0 } else { 7 };
-    
-        for i in 0..6 {
-            if self.pits[offset + i] != 0 { out.push(offset + i).unwrap(); }
-        }
-
-        out
-    }
-
-    pub fn eval(&self) -> i32 {
-        self.pits[6] as i32 - self.pits[13] as i32
+            self.pits[6]
+        )
     }
 }
 
-// enum MancalaMoveResult {
-//     TurnFinished,
-//     CanMakeAnotherMove
-// }
+pub trait MancalaGame {
+    fn make_move(&mut self, pit_idx: usize);
+    fn valid_moves(&self) -> StackList<usize, 6>;
+    fn eval(&self) -> i32;
+    fn is_own_turn(&self) -> bool;
+}

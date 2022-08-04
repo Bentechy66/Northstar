@@ -1,6 +1,7 @@
-use crate::mancala;
+use crate::kalah;
+use crate::mancala::MancalaGame;
 
-pub fn best_move(board: mancala::Mancala, depth: u8) -> Option<usize> {
+pub fn best_move(board: kalah::KalahGame, depth: u8) -> Option<usize> {
     let mut best_move = None;
     let mut best_score = i32::MIN;
 
@@ -19,14 +20,14 @@ pub fn best_move(board: mancala::Mancala, depth: u8) -> Option<usize> {
     best_move
 }
 
-pub fn minimax(board: mancala::Mancala, depth: u8, mut alpha: i32, mut beta: i32) -> i32 {
+pub fn minimax<T: MancalaGame + Clone>(board: T, depth: u8, mut alpha: i32, mut beta: i32) -> i32 {
     if depth == 0 {
         return board.eval()
     }
 
     let mut value;
 
-    if board.own_turn {
+    if board.is_own_turn() {
         value = i32::MIN;
 
         for mve in board.valid_moves().iter() {

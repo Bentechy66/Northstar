@@ -1,34 +1,24 @@
 mod mancala;
 mod search;
 mod stacklist;
+mod kalah;
+
+use crate::mancala::MancalaGame;
 
 fn main() {
-    use std::time::Instant;
-    let now = Instant::now();
-
-    let board = mancala::Mancala::new();
-
-    // println!("{}", search::best_move(board.clone(), 16).unwrap());
-
-    for _ in 0..10 {
-        search::best_move(board.clone(), 15).unwrap();
-    }
-
-    let elapsed = now.elapsed();
-    println!("Elapsed: {:.2?}", elapsed);
+    let mut board = kalah::KalahGame::from_mancala(mancala::Mancala::new());
 
     loop {
-        let mut board = mancala::Mancala::new();
-        // board.print();
-
-        if board.own_turn {
+        if board.is_own_turn() {
             let best_move = search::best_move(board.clone(), 15).unwrap();
 
             println!("Making move {}", best_move);
 
             board.make_move(best_move);
         } else {
-            board.print();
+            println!("{}", board);
+
+            print!("Enter pit to move with (id) > ");
 
             let mut input_text = String::new();
             std::io::stdin()
