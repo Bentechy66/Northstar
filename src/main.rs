@@ -1,5 +1,6 @@
 mod mancala;
 mod search;
+mod stacklist;
 
 fn main() {
     use std::time::Instant;
@@ -16,9 +17,8 @@ fn main() {
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
 
-    return;
-
     loop {
+        let mut board = mancala::Mancala::new();
         // board.print();
 
         if board.own_turn {

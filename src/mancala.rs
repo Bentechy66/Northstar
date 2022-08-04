@@ -1,17 +1,21 @@
-// Mancala Board pit IDs:
-// Own Pits     Enemy Pits
-//
-//   [Enemy Store: 13]
-//
-//    0     ID     12
-//    1     ID     11
-//    2     ID     10
-//    3     ID     9
-//    4     ID     8
-//    5     ID     7
-//
-//   [ Own Store: 6 ]
+use crate::stacklist::StackList;
 
+/// Describes a Mancala board.
+/// Lightweight wrapper around an array of pits.
+/// 
+/// Mancala Board pit IDs:
+/// Own Pits     Enemy Pits
+///
+///   [Enemy Store: 13]
+///
+///    0     ID     12
+///    1     ID     11
+///    2     ID     10
+///    3     ID     9
+///    4     ID     8
+///    5     ID     7
+///
+///   [ Own Store: 6 ]
 #[derive(Clone)]
 pub struct Mancala {
     pub own_turn: bool,
@@ -82,21 +86,19 @@ impl Mancala {
                         self.pits[pit_idx] = 0;
                     }
                 }
-
-                
             }
 
             self.own_turn = !self.own_turn;
         }
     }
 
-    pub fn valid_moves(&self) -> [Option<usize>; 6] {
-        let mut out = [None; 6];
+    pub fn valid_moves(&self) -> StackList<usize, 6> {
+        let mut out: StackList<usize, 6> = StackList::new();
     
         let offset = if self.own_turn { 0 } else { 7 };
     
         for i in 0..6 {
-            if self.pits[offset + i] != 0 { out[i] = Some(offset + i) }
+            if self.pits[offset + i] != 0 { out.push(offset + i).unwrap(); }
         }
 
         out
